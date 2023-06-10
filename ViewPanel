@@ -1,0 +1,230 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+
+public class ViewPanel extends JPanel {
+	private EggrafesFrame frame_ref;
+	private JButton back_button;
+	private JButton delete_button;
+	private JTextField fname_field;
+	private JLabel fname_label;
+	private JTextField id_field;
+	private JLabel id_label;
+	private JButton left_button;
+	private JButton right_button;
+	private JTextField lname_field;
+	private JLabel lname_label;
+	private JComboBox<String> pos_combobox;
+	private JLabel pos_label;
+	private JButton update_button;
+	private ArrayList<Employee> employees;
+
+	int viewed_employee_index = 0;
+
+	public ViewPanel(EggrafesFrame frame, ArrayList<Employee> empl) {
+		frame_ref = frame;
+		employees = empl;
+
+		initComponents();
+	}
+
+	private void initComponents() {
+		id_label = new JLabel();
+		id_field = new JTextField();
+		fname_label = new JLabel();
+		fname_field = new JTextField(); //
+		lname_label = new JLabel();
+		lname_field = new JTextField(); //
+		pos_label = new JLabel();
+		pos_combobox = new JComboBox<>();
+		delete_button = new JButton();
+		update_button = new JButton();
+		back_button = new JButton();
+		left_button = new JButton();
+		right_button = new JButton();
+
+		setBackground(new Color(231, 255, 255));
+
+		id_label.setText("ID:");
+
+		id_field.setFocusable(false);
+
+		pos_combobox.setModel(new DefaultComboBoxModel<>(new String[] { "Manager", "Developer", "Tester" }));
+
+		view_employee();
+
+		fname_label.setText("Όνομα:");
+
+		lname_label.setText("Επίθετο:");
+
+		pos_label.setText("Θέση:");
+
+		delete_button.setText("Διαγραφή");
+		delete_button.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("DELETE!");
+				frame_ref.delete_employee_from_db(employees.get(viewed_employee_index).getId());
+				employees.remove(viewed_employee_index);
+
+				if (employees.size() == 0) {
+					frame_ref.set_view("search");
+
+				} else {
+					viewed_employee_index = 0;
+					view_employee();
+				}
+
+			}
+		});
+
+		update_button.setText("Ενημέρωση");
+		update_button.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				int sel_index = pos_combobox.getSelectedIndex();
+				Position pos;
+				if(sel_index == 0) {
+					pos = Position.MANAGER;
+				} else if(sel_index == 1) {
+					pos = Position.DEVELOPER;
+				}
+				else {
+					pos = Position.TESTER;
+				}
+				frame_ref.update_employee_on_db(employees.get(viewed_employee_index).getId(), fname_field.getText(), lname_field.getText(), pos);
+			}
+		});
+		
+		back_button.setText("<-");
+		back_button.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				frame_ref.set_view("search");
+			}
+		});
+
+		left_button.setText("<");
+		left_button.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("Aristera!");
+				if (0 < viewed_employee_index) {
+					viewed_employee_index--;
+					view_employee();
+				}
+			}
+		});
+
+		right_button.setText(">");
+		right_button.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("Deksia!");
+				if (viewed_employee_index < employees.size() - 1) {
+					viewed_employee_index++;
+					view_employee();
+				}
+			}
+		});
+
+		GroupLayout layout = new GroupLayout(this);
+		this.setLayout(layout);
+		layout.setHorizontalGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING).addGroup(layout
+				.createSequentialGroup()
+				.addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+						.addGroup(GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+								.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE).addComponent(back_button))
+						.addGroup(layout.createSequentialGroup().addGap(215, 215, 215)
+								.addComponent(update_button, GroupLayout.PREFERRED_SIZE, 107,
+										GroupLayout.PREFERRED_SIZE)
+								.addGap(47, 47, 47)
+								.addComponent(delete_button, GroupLayout.PREFERRED_SIZE, 107,
+										GroupLayout.PREFERRED_SIZE)
+								.addGap(0, 218, Short.MAX_VALUE)))
+				.addContainerGap())
+				.addGroup(layout.createSequentialGroup().addGap(292, 292, 292)
+						.addComponent(left_button, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE)
+						.addGap(18, 18, 18)
+						.addComponent(right_button, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE)
+						.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+				.addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING).addGroup(layout
+						.createSequentialGroup().addGap(224, 224, 224)
+						.addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+								.addGroup(layout.createSequentialGroup()
+										.addComponent(id_label, GroupLayout.PREFERRED_SIZE, 85,
+												GroupLayout.PREFERRED_SIZE)
+										.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).addComponent(id_field,
+												GroupLayout.PREFERRED_SIZE, 161, GroupLayout.PREFERRED_SIZE))
+								.addGroup(layout.createSequentialGroup()
+										.addComponent(fname_label, GroupLayout.PREFERRED_SIZE, 85,
+												GroupLayout.PREFERRED_SIZE)
+										.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+										.addComponent(fname_field, GroupLayout.PREFERRED_SIZE, 161,
+												GroupLayout.PREFERRED_SIZE))
+								.addGroup(layout.createSequentialGroup()
+										.addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+												.addComponent(pos_label, GroupLayout.PREFERRED_SIZE, 85,
+														GroupLayout.PREFERRED_SIZE)
+												.addComponent(lname_label, GroupLayout.PREFERRED_SIZE, 85,
+														GroupLayout.PREFERRED_SIZE))
+										.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+										.addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
+												.addComponent(lname_field).addComponent(pos_combobox,
+														GroupLayout.PREFERRED_SIZE, 161, GroupLayout.PREFERRED_SIZE))))
+						.addContainerGap(224, Short.MAX_VALUE))));
+		layout.setVerticalGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+				.addGroup(GroupLayout.Alignment.TRAILING,
+						layout.createSequentialGroup().addContainerGap().addComponent(back_button)
+								.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+								.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+										.addComponent(left_button).addComponent(right_button))
+								.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 238, Short.MAX_VALUE)
+								.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+										.addComponent(update_button, GroupLayout.PREFERRED_SIZE, 40,
+												GroupLayout.PREFERRED_SIZE)
+										.addComponent(delete_button, GroupLayout.PREFERRED_SIZE, 40,
+												GroupLayout.PREFERRED_SIZE))
+								.addGap(14, 14, 14))
+				.addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING).addGroup(layout
+						.createSequentialGroup().addGap(76, 76, 76)
+						.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+								.addComponent(id_field, GroupLayout.PREFERRED_SIZE, 36, GroupLayout.PREFERRED_SIZE)
+								.addComponent(id_label, GroupLayout.PREFERRED_SIZE, 36, GroupLayout.PREFERRED_SIZE))
+						.addGap(18, 18, 18)
+						.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+								.addComponent(fname_field, GroupLayout.PREFERRED_SIZE, 36, GroupLayout.PREFERRED_SIZE)
+								.addComponent(fname_label, GroupLayout.PREFERRED_SIZE, 36, GroupLayout.PREFERRED_SIZE))
+						.addGap(18, 18, 18)
+						.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+								.addComponent(lname_field, GroupLayout.PREFERRED_SIZE, 36, GroupLayout.PREFERRED_SIZE)
+								.addComponent(lname_label, GroupLayout.PREFERRED_SIZE, 36, GroupLayout.PREFERRED_SIZE))
+						.addGap(18, 18, 18)
+						.addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
+								.addComponent(pos_combobox)
+								.addComponent(pos_label, GroupLayout.PREFERRED_SIZE, 36, GroupLayout.PREFERRED_SIZE))
+						.addContainerGap(76, Short.MAX_VALUE))));
+	}
+
+	void view_employee() {
+		id_field.setText(Integer.toString(employees.get(viewed_employee_index).getId()));
+		fname_field.setText(employees.get(viewed_employee_index).getName());
+		lname_field.setText(employees.get(viewed_employee_index).getLast_name());
+
+		if (employees.get(viewed_employee_index).getTitlos() == Position.MANAGER)
+			pos_combobox.setSelectedIndex(0);
+		else if (employees.get(viewed_employee_index).getTitlos() == Position.DEVELOPER)
+			pos_combobox.setSelectedIndex(1);
+		else
+			pos_combobox.setSelectedIndex(2);
+	}
+
+}
